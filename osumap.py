@@ -31,7 +31,7 @@ class Map:
 		self.stackLeniency = 0.0
 		self.mode = 0
 		self.letterboxInBreaks = 0
-		self.WidescreenStoryboard = 0
+		self.widescreenStoryboard = 0
 		
 		# Editor
 		self.distanceSpacing = 0
@@ -118,7 +118,7 @@ class Map:
 		self.stackLeniency = float(mapArray[self.generalMarker+6].split(': ')[1])
 		self.mode = int(mapArray[self.generalMarker+7].split(': ')[1])
 		self.letterboxInBreaks = int(mapArray[self.generalMarker+8].split(': ')[1])
-		self.WidescreenStoryboard = int(mapArray[self.generalMarker+9].split(': ')[1])
+		self.widescreenStoryboard = int(mapArray[self.generalMarker+9].split(': ')[1])
 		
 		# Editor
 		self.distanceSpacing = int(mapArray[self.editorMarker+1].split(': ')[1])
@@ -140,11 +140,11 @@ class Map:
 		
 		# Difficulty
 		self.hpDrainRate = float(mapArray[self.difficultyMarker+1].split(':')[1])
-		self.circleSize = float(mapArray[self.difficultyMarker+1].split(':')[1])
-		self.overallDifficulty = float(mapArray[self.difficultyMarker+1].split(':')[1])
-		self.approachRate = float(mapArray[self.difficultyMarker+1].split(':')[1])
-		self.sliderMultiplier = float(mapArray[self.difficultyMarker+1].split(':')[1])
-		self.sliderTickRate = float(mapArray[self.difficultyMarker+1].split(':')[1])
+		self.circleSize = float(mapArray[self.difficultyMarker+2].split(':')[1])
+		self.overallDifficulty = float(mapArray[self.difficultyMarker+3].split(':')[1])
+		self.approachRate = float(mapArray[self.difficultyMarker+4].split(':')[1])
+		self.sliderMultiplier = float(mapArray[self.difficultyMarker+5].split(':')[1])
+		self.sliderTickRate = float(mapArray[self.difficultyMarker+6].split(':')[1])
 		
 		#Events (liste de lignes)
 		self.backgroundAndVideoEvents = []
@@ -198,6 +198,46 @@ class Map:
 		for i in range(self.hitObjectsMarker+1, hitObjectsEndMarker):
 			self.hitObjects.append(mapArray[i].replace('\n', ''))
 			
+	# print des sections
+	def printGeneral(self):
+		print('AudioFilename :', self.audioFilename)
+		print('AudioLeadIn :', self.audioLeadIn)
+		print('PreviewTime :', self.previewTime)
+		print('Countdown :', self.countdown)
+		print('SampleSet :', self.sampleSet)
+		print('StackLeniency :', self.stackLeniency)
+		print('Mode :', self.mode)
+		print('LetterboxInBreaks', self.letterboxInBreaks)
+		print('WidescreenStoryboard :', self.widescreenStoryboard)
+		
+	def printEditor(self):
+		print('DistanceSpacing :', self.distanceSpacing)
+		print('BeatDivisor :', self.beatDivisor)
+		print('GridSize :', self.gridSize)
+		print('TimelineZone :', self.timelineZoom)
+	
+	def printMetadata(self):
+		print('Title :', self.title)
+		print('TitleUnicode :', self.titleUnicode)
+		print('Artist :', self.artist)
+		print('ArtistUnicode :', self.artistUnicode)
+		print('Creator :', self.creator)
+		print('Version :', self.version)
+		print('Source :', self.source)
+		print('tags :', self.tags)
+		print('BeatmapID :', self.beatmapID)
+		print('BeatmapSetID :', self.beatmapSetID)
+		
+	def printDifficulty(self):
+		print('HPDrainRate :', self.hpDrainRate)
+		print('CircleSize :', self.circleSize)
+		print('OverallDifficulty :', self.overallDifficulty)
+		print('ApproachRate :', self.approachRate)
+		print('SliderMultiplier :', self.sliderMultiplier)
+		print('SliderTickRate :', self.sliderTickRate)
+			
+	# Exploitations des données
+			
 	def extractTimingPoints(self):
 		timingPoints = []
 		for i, el in enumerate(self.timingPoints):
@@ -209,8 +249,8 @@ class Map:
 	def extractHitObjects(self):
 		hitObjects = []
 		for i, el in enumerate(self.hitObjects):
-			type, object = self.guessHitObject(el)
-			hitObjects.append([type, object])
+			object = self.guessHitObject(el)
+			hitObjects.append(object)
 			
 		return hitObjects
 			
@@ -218,17 +258,19 @@ class Map:
 	def guessHitObject(self, hitObject):
 		array = hitObject.split(',')
 		if (len(array) == 11 or ('|' in hitObject)):
-			return 'slider', Slider(hitObject)
+			return Slider(hitObject)
 		elif (len(array) == 6):
-			return 'hitCircle', HitCircle(hitObject)
+			return HitCircle(hitObject)
 		else:
-			return 'spinner', Spinner(hitObject)
+			return Spinner(hitObject)
 	
 class TimingPoint:
 	def __init__(self, data):
 		# Définition
 		self.offset = 0
 		self.millisecondsPerBeat = 0.0
+		self.bpm = 0.0
+		self.multiplier = 0.0
 		self.meter = 0
 		self.sampleType = 0
 		self.sampleSet = 0
@@ -240,6 +282,10 @@ class TimingPoint:
 		array = data.split(',')
 		self.offset = int(array[0])
 		self.millisecondsPerBeat = float(array[1])
+		if (self.millisecondsPerBeat < 0):
+			self.multiplier = self.millisecondsPerBeat / -100
+		else:
+			self.bpm = 60000/self.millisecondsPerBeat
 		self.meter = int(array[2])
 		self.sampleType = int(array[3])
 		self.sampleSet = int(array[4])
