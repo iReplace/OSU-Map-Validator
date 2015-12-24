@@ -1,8 +1,7 @@
 import os
 from osumap import *
 from utils import *
-
-print('You\'re Welcome !')
+from math import *
 
 #path = input('Entrez le chemin de votre map : ')
 path = '/Users/jeanbaptistecaplan/Documents/py/osu/map_valide.osu'
@@ -24,18 +23,17 @@ if (TimingPointsPosition < 0):
 	raise InvalidMapFileException('Votre map est invalide, il manque le marqueur "[TimingPoints]"')
 		
 
+# Initialisation d'un objet Map à partir des données tirées du fichier
 map = Map(mapLinesArray)
 
+# Récupération des TimingPoints et HitObjects depuis l'objet map
 timingPoints = map.extractTimingPoints()
 hitObjects = map.extractHitObjects()
 
-print(len(timingPoints))
-print(len(hitObjects))
-
-#print('Cette map est réalise pour la version', map.osuVersion, 'de OSU')
-#print('Le nom de la map est', map.title)
-#print('Le créateur de la map est', map.creator)
-#print('Le fichier audio associé est', map.audioFilename)
-#print('beatmapID :', map.beatmapID)
-#print('circleSize :', map.circleSize)
-#print('tags :', map.tags)
+# Petite boucle de calcul de la distance entre les [HitObjects] consécutifs
+for i, el in enumerate(hitObjects):
+	if (i > 0):
+		x = hitObjects[i-1].x - el.x
+		y = hitObjects[i-1].y - el.y
+		distance = sqrt(x**2 + y**2)
+		print(distance)
