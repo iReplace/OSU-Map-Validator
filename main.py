@@ -5,6 +5,7 @@ from math import *
 
 #path = input('Entrez le chemin de votre map : ')
 path = '/Users/jeanbaptistecaplan/Documents/py/osu/map_valide.osu'
+path = '/Users/jeanbaptistecaplan/Documents/py/osu/S3RL - MTC (Different Heaven Remix) (-Genesis) [Aeon\'s Taiko Oni].osu'
 #path = '/Users/jeanbaptistecaplan/Documents/py/osu/map_invalide.osu'
 
 # On ouvre, on stocke toute les lignes puis on referme le fichier
@@ -30,10 +31,14 @@ map = Map(mapLinesArray)
 timingPoints = map.extractTimingPoints()
 hitObjects = map.extractHitObjects()
 
+map.printEditor()
+
 # Petite boucle de calcul de la distance entre les [HitObjects] consécutifs
-for i, el in enumerate(hitObjects):
-	if (i > 0):
-		x = hitObjects[i-1].x - el.x
-		y = hitObjects[i-1].y - el.y
-		distance = sqrt(x**2 + y**2)
-		print(distance)
+#for i, el in enumerate(hitObjects):
+#	if (type(el) is Spinner):
+#		print(el.time)
+#	if (i > 0):
+#		x = hitObjects[i-1].x - el.x
+#		y = hitObjects[i-1].y - el.y
+#		distance = sqrt(x**2 + y**2)
+#		print(distance)

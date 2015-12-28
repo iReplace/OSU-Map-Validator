@@ -34,7 +34,8 @@ class Map:
 		self.widescreenStoryboard = 0
 		
 		# Editor
-		self.distanceSpacing = 0
+		self.bookmarks = []
+		self.distanceSpacing = 0.0
 		self.beatDivisor = 0
 		self.gridSize = 0
 		self.timelineZoom = 0.0
@@ -103,8 +104,7 @@ class Map:
 		if self.timingPointsMarker < 0:
 			raise InvalidMapFileException('Votre map est invalide, il manque le marqueur "[TimingPoints]"')
 		self.coloursMarker = search('[Colours]\n', mapArray)
-		if self.coloursMarker < 0:
-			raise InvalidMapFileException('Votre map est invalide, il manque le marqueur "[Colours]"')
+		# Pas de vérification car les couleurs ne sont pas obligatoires
 		self.hitObjectsMarker = search('[HitObjects]\n', mapArray)
 		if self.hitObjectsMarker < 0:
 			raise InvalidMapFileException('Votre map est invalide, il manque le marqueur "[HitObjects]"')
@@ -121,10 +121,17 @@ class Map:
 		self.widescreenStoryboard = int(mapArray[self.generalMarker+9].split(': ')[1])
 		
 		# Editor
-		self.distanceSpacing = int(mapArray[self.editorMarker+1].split(': ')[1])
-		self.beatDivisor = int(mapArray[self.editorMarker+2].split(': ')[1])
-		self.gridSize = int(mapArray[self.editorMarker+3].split(': ')[1])
-		self.timelineZoom = float(mapArray[self.editorMarker+4].split(': ')[1])
+		bArray = mapArray[self.editorMarker+1].split(': ')
+		b = 0
+		if (bArray[0] == 'Bookmarks'):
+			for el in bArray[1].split(','):
+				self.bookmarks.append(int(el))
+			b = 1;
+		
+		self.distanceSpacing = float(mapArray[self.editorMarker+1+b].split(': ')[1])
+		self.beatDivisor = int(mapArray[self.editorMarker+2+b].split(': ')[1])
+		self.gridSize = int(mapArray[self.editorMarker+3+b].split(': ')[1])
+		self.timelineZoom = float(mapArray[self.editorMarker+4+b].split(': ')[1])
 	
 		#Metadata
 		self.title = mapArray[self.metadataMarker+1].split(':')[1].replace('\n', '')
@@ -170,17 +177,18 @@ class Map:
 			self.timingPoints.append(mapArray[i].replace('\n', ''))
 				
 		# Colours (liste de lignes)
-		# On récupère l'index de la dernière ligne délimitant [Colours]
-		coloursEndMarker = -1
-		for i in range(self.coloursMarker, len(mapArray)):
-			if (mapArray[i] == '\n'):
-				coloursEndMarker = i
-			if coloursEndMarker > 0 : break
-		if coloursEndMarker < 0:
-			raise InvalidMapFileException('Un problème à eu lieu lors de la récupération de la section [Colours]')
-		# On place toutes ligne correspondante dans notre attribut timingPoints
-		for i in range(self.coloursMarker+1, coloursEndMarker):
-			self.colours.append(mapArray[i].replace('\n', ''))
+		# On récupère l'index de la dernière ligne délimitant [Colours] (que si il y'a un marqueur couleur)
+		if (self.coloursMarker > 0):
+			coloursEndMarker = -1
+			for i in range(self.coloursMarker, len(mapArray)):
+				if (mapArray[i] == '\n'):
+					coloursEndMarker = i
+				if coloursEndMarker > 0 : break
+			if coloursEndMarker < 0:
+				raise InvalidMapFileException('Un problème à eu lieu lors de la récupération de la section [Colours]')
+			# On place toutes ligne correspondante dans notre attribut timingPoints
+			for i in range(self.coloursMarker+1, coloursEndMarker):
+				self.colours.append(mapArray[i].replace('\n', ''))
 		
 		# HitObjects (liste de lignes)
 		# On récupère l'index de la dernière ligne délimitant [HitObjects]
@@ -211,6 +219,8 @@ class Map:
 		print('WidescreenStoryboard :', self.widescreenStoryboard)
 		
 	def printEditor(self):
+		if (len(self.bookmarks) > 0):
+			print('Bookmarks :', self.bookmarks)
 		print('DistanceSpacing :', self.distanceSpacing)
 		print('BeatDivisor :', self.beatDivisor)
 		print('GridSize :', self.gridSize)
@@ -259,12 +269,12 @@ class Map:
 		array = hitObject.split(',')
 		typeHitObject = int(array[3])
 		
-		if (typeHitObject == 2 or typeHitObject == 6):
-			return Slider(hitObject)
+		if (typeHitObject == 12 or typeHitObject == 16):
+			return Spinner(hitObject)
 		elif (typeHitObject == 1 or typeHitObject == 5):
 			return HitCircle(hitObject)
 		else:
-			return Spinner(hitObject)
+			return Slider(hitObject)
 	
 class TimingPoint:
 	def __init__(self, data):
