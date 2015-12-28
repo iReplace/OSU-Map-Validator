@@ -120,6 +120,10 @@ class Map:
 		self.letterboxInBreaks = int(mapArray[self.generalMarker+8].split(': ')[1])
 		self.widescreenStoryboard = int(mapArray[self.generalMarker+9].split(': ')[1])
 		
+		# Erreur si ce n'est pas une map en mode OSU "normal" on lève une erreur
+		if (self.mode != 0):
+			raise InvalidMapFileException('Ce programme ne prend en charge que les maps OSU normal...')
+		
 		# Editor
 		bArray = mapArray[self.editorMarker+1].split(': ')
 		b = 0
@@ -268,7 +272,6 @@ class Map:
 	def guessHitObject(self, hitObject):
 		array = hitObject.split(',')
 		typeHitObject = int(array[3])
-		
 		if (typeHitObject == 12 or typeHitObject == 16):
 			return Spinner(hitObject)
 		elif (typeHitObject == 1 or typeHitObject == 5):
