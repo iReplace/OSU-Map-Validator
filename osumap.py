@@ -257,9 +257,11 @@ class Map:
 		
 	def guessHitObject(self, hitObject):
 		array = hitObject.split(',')
-		if (len(array) == 11 or ('|' in hitObject)):
+		typeHitObject = int(array[3])
+		
+		if (typeHitObject == 2 or typeHitObject == 6):
 			return Slider(hitObject)
-		elif (len(array) == 6):
+		elif (typeHitObject == 1 or typeHitObject == 5):
 			return HitCircle(hitObject)
 		else:
 			return Spinner(hitObject)
