@@ -58,6 +58,7 @@ class Map:
 		self.overallDifficulty = 0.0
 		self.approachRate = 0.0
 		self.sliderMultiplier = 0.0
+		self.distanceSnap = 0.0
 		self.sliderTickRate = 0.0
 		
 		#Events (liste de lignes)
@@ -155,6 +156,7 @@ class Map:
 		self.overallDifficulty = float(mapArray[self.difficultyMarker+3].split(':')[1])
 		self.approachRate = float(mapArray[self.difficultyMarker+4].split(':')[1])
 		self.sliderMultiplier = float(mapArray[self.difficultyMarker+5].split(':')[1])
+		self.distanceSnap = self.sliderMultiplier * 100
 		self.sliderTickRate = float(mapArray[self.difficultyMarker+6].split(':')[1])
 		
 		#Events (liste de lignes)
@@ -248,6 +250,7 @@ class Map:
 		print('OverallDifficulty :', self.overallDifficulty)
 		print('ApproachRate :', self.approachRate)
 		print('SliderMultiplier :', self.sliderMultiplier)
+		print('*DistanceSnap :', self.distanceSnap)
 		print('SliderTickRate :', self.sliderTickRate)
 			
 	# Exploitations des données
@@ -341,6 +344,9 @@ class Slider:
 				self.edgeAddition = array[9]
 				if (len(array) > 10):
 					self.addition = array[10]
+					
+	def __str__(self):
+		return str(self.x) + ' ' + str(self.y) + ' ' + str(self.time) + ' ' + str(self.type) + ' ' + str(self.hitSound) + ' ' + str(self.sliderType) + ' ' + str(self.curves) + ' ' + str(self.repeat) + ' ' + str(self.pixelLength) + ' ' + str(self.edgeHitsound) + ' ' + str(self.edgeAddition) + ' ' + str(self.addition)
 
 		
 
@@ -363,6 +369,9 @@ class HitCircle:
 		self.hitSound = int(array[4])
 		if (len(array) > 5):
 			self.addition = array[5]
+	
+	def __str__(self):
+		return str(self.x) + ' ' + str(self.y) + ' ' + str(self.time) + ' ' + str(self.type) + ' ' + str(self.hitSound) + ' ' + str(self.addition)
 		
 		
 class Spinner:
@@ -386,14 +395,16 @@ class Spinner:
 		self.endTime = int(array[5])
 		if (len(array) > 6):
 			self.addition = array[6]
-		
+	
+	def __str__(self):
+		return str(self.x) + ' ' + str(self.y) + ' ' + str(self.time) + ' ' + str(self.type) + ' ' + str(self.hitSound) + ' ' + str(self.endTime) + ' ' + str(self.addition)
+				
 				
 class InvalidMapFileException(Exception):
 	def __init__(self, value):
 		self.value = value
 	def __str__(self):
-		return repr(self.value)
-		
+		return repr(self.value)		
 		
 		
 		
